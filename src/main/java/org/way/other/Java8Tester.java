@@ -6,6 +6,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 /**
  * 参考
@@ -104,9 +108,38 @@ public class Java8Tester {
 
     @Test
     public void how() {
+        //todo stream api?
+        //参考 https://blog.csdn.net/java_zjh/article/details/81268958
+
         //todo Java8四大内置函数式接口
         //我们发现，如果使用Lambda还要自己写一个接口的话太麻烦，所以Java自己提供了一些接口:
-
+        /**
+         * Java8内置的四大核心函数式接口
+         * <p>
+         * Consumer<T>: 消费型接口
+         * void accept(T t);
+         *
+         * Supplier<T>:供给型接口
+         * T get();
+         *
+         * Function<T, R>: 函数型接口
+         * R apply(T t);
+         *
+         * Predicate<T>: 断言型接口:
+         * boolean test(T t);
+         *
+         *Java8中还提供了其他函数式接口
+         *
+         * 上述中的"T"都代表的是参数或者返回值,在Fun中代表参数,R代表返回值.
+         * consumer中T是参数,无返回值,即对T可以做任意操作
+         * supplier中T是返回值,无参数,即可以任意方式产生T
+         * Fun是上述两种结合,可以使用参数T来产生结果R
+         * Pre是结果给定是布尔,特殊的Fun.
+         */
+        testConsumer();
+        testSupplier();
+        testFunction();
+        testPredicate();
 
         //todo 方法引用和构造器引用
     }
@@ -269,5 +302,54 @@ public class Java8Tester {
             }
         }
         return emps;
+    }
+
+    //-------------------------4大内置-------------------------------
+    @Test
+    public void testConsumer(){
+        apply(1000,(num) -> System.out.println("消费了" + num + "元!"));
+    }
+    public void apply(double num, Consumer<Double> con){
+        con.accept(num);
+    }
+
+    public void testSupplier(){
+        ArrayList<Integer> res = getNumList(10, () -> (int) (Math.random() * 100));
+        System.out.println(res);
+    }
+    //需求，产生指定个数的整数，并放入集合中
+    public ArrayList<Integer> getNumList(int num, Supplier<Integer> sup){
+        ArrayList<Integer>list = new ArrayList<>();
+        for(int i = 0; i < num; i++){
+            Integer e = sup.get();
+            list.add(e);
+        }
+        return list;
+    }
+
+    public void testFunction(){
+        String newStr = strHandler("abc", (str) -> str.toUpperCase());
+        System.out.println(newStr);
+        newStr = strHandler("   abc  ", (str) -> str.trim());
+        System.out.println(newStr);
+    }
+    public String strHandler(String str, Function<String,String> fun){
+        return fun.apply(str);
+    }
+
+    public void testPredicate(){
+        List<String> list = Arrays.asList("Hello", "atguiu", "lambda", "ok", "www", "z");
+        List<String> res = filterStr(list, (str) -> str.length() > 2);
+        System.out.println(res);
+    }
+    //需求
+    public List<String> filterStr(List<String>list, Predicate<String> pre){
+        ArrayList<String>res = new ArrayList<>();
+        for(String str : list){
+            if(pre.test(str)){
+                res.add(str);
+            }
+        }
+        return res;
     }
 }
